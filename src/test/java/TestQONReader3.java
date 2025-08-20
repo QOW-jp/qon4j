@@ -7,7 +7,7 @@ import java.io.IOException;
 
 public class TestQONReader3 {
     public static void main(String[] args) throws UntrustedQONException, IOException {
-        File file = new File("src/main/resources/test3.qon");
+        File file = new File("src/test/resources/test3.qon");
         QONObject pr = new QONObject(file);
 
         String[] targets = {"string", "int", "object", "list", "404"};

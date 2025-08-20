@@ -91,7 +91,7 @@ public class QONObject {
 
         for (int i = 0; i < lines.length; i++) {
             String line = lines[i];
-            if (!isCommentOuted(line) && !line.isEmpty()) {
+            if (!isCommentOuted(line) && !isNoMean(line)) {
                 if (object) {
                     if (isObjectEnd(line)) {
                         indent--;
@@ -131,6 +131,10 @@ public class QONObject {
 
     private boolean isCommentOuted(String target) {
         return target.startsWith("#");
+    }
+
+    private boolean isNoMean(String target) {
+        return target.isBlank();
     }
 
     private boolean isObjectStart(String target) {
