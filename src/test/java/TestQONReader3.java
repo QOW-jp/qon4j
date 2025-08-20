@@ -21,7 +21,7 @@ public class TestQONReader3 {
             System.out.printf("ob_%s=%s\n", target, object.get(target));
         }
 
-        QONObject son = object.getQONObject("sonject");
+        QONObject son = object.getQONObject("son_object");
         String[] targets3 = {"string3", "int3", "string", "404"};
         for (String target : targets3) {
             System.out.printf("son_%s=%s\n", target, son.get(target));

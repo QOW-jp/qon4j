@@ -4,17 +4,30 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+/**
+ * qon(Qow Object Notation)の読み込みをする<br>
+ *
+ * @version 2025/08/20
+ * @since 1.0.0
+ */
 public class QONObject {
     private final Map<String, String> valueMap;
     private final Map<String, QONObject> objectMap;
     private final Map<String, QONArray> arrayMap;
 
-    public QONObject() {
+    private QONObject() {
         valueMap = new HashMap<>();
         objectMap = new HashMap<>();
         arrayMap = new HashMap<>();
     }
 
+    /**
+     * qonファイルからqonを読み込む。
+     *
+     * @param file qonファイルパス
+     * @throws IOException           qonファイルの読み込みに問題が生じた場合
+     * @throws UntrustedQONException qon構文に不備がある場合
+     */
     public QONObject(File file) throws IOException, UntrustedQONException {
         this();
 
@@ -29,6 +42,12 @@ public class QONObject {
         init(lines.toArray(new String[0]));
     }
 
+    /**
+     * qon構文に従った配列からqonを読み込む。
+     *
+     * @param lines qonドキュメント
+     * @throws UntrustedQONException qon構文に不備がある場合
+     */
     public QONObject(String[] lines) throws UntrustedQONException {
         this();
 
@@ -36,18 +55,35 @@ public class QONObject {
     }
 
 
+    /**
+     * キーに対応する{@link QONObject}を返す。
+     *
+     * @param key キー
+     * @return キーに対応する{@link QONObject}
+     */
     public QONObject getQONObject(String key) {
         return objectMap.get(key);
     }
 
+    /**
+     * キーに対応する{@link QONArray}を返す。
+     *
+     * @param key キー
+     * @return キーに対応する{@link QONArray}
+     */
     public QONArray getQONArray(String key) {
         return arrayMap.get(key);
     }
 
+    /**
+     * キーに対応する値を返す。
+     *
+     * @param key キー
+     * @return キーに対応する値
+     */
     public String get(String key) {
         return valueMap.get(key);
     }
-
 
     private void init(String[] lines) throws UntrustedQONException {
         boolean object = false, array = false;

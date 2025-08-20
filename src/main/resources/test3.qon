@@ -7,7 +7,7 @@ boolean=true
 object{
 string2=test2
 int2=2
-sonject{
+son_object{
 string3=test3
 int3=3
 }
