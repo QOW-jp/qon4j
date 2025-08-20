@@ -1,0 +1,14 @@
+string=test1
+int=1
+long=21474836470
+double=1.23456
+null=null
+boolean=true
+object{
+string2=test2
+int2=2
+}
+list[
+4
+list
+]

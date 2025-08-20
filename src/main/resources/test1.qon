@@ -1,0 +1,6 @@
+string=test1
+int=1
+long=21474836470
+double=1.23456
+null=null
+boolean=true
