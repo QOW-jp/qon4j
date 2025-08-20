@@ -54,7 +54,6 @@ public class QONObject {
         init(lines);
     }
 
-
     /**
      * キーに対応する{@link QONObject}を返す。
      *
@@ -105,13 +104,10 @@ public class QONObject {
                     }
                 } else if (array) {
                     if (isArrayEnd(line)) {
-                        indent--;
-                        if (indent == 0) {
-                            array = false;
-                            arrayMap.put(lines[arrayStartIndex].substring(0, lines[arrayStartIndex].length() - 1), new QONArray(Arrays.copyOfRange(lines, arrayStartIndex + 1, i)));
-                        }
-                    } else if (isArrayStart(line)) {
-                        indent++;
+                        array = false;
+                        arrayMap.put(lines[arrayStartIndex].substring(0, lines[arrayStartIndex].length() - 1), new QONArray(Arrays.copyOfRange(lines, arrayStartIndex + 1, i)));
+                    } else if (isArrayStart(line) || isObjectStart(line)) {
+                        throw new UntrustedQONException("multiple array.");
                     }
                 } else if (isObjectStart(line)) {
                     object = true;
@@ -120,7 +116,6 @@ public class QONObject {
                 } else if (isArrayStart(line)) {
                     array = true;
                     arrayStartIndex = i;
-                    indent++;
                 } else if (isValue(line)) {
                     String[] strings = line.split("=", 2);
                     String key = strings[0];
