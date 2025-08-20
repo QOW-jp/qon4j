@@ -2,50 +2,123 @@ package com.qow.util.qon;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class QONObject {
-    private final Map<String, String> map;
+    private final Map<String, String> valueMap;
+    private final Map<String, QONObject> objectMap;
+    private final Map<String, QONArray> arrayMap;
+
+    public QONObject() {
+        valueMap = new HashMap<>();
+        objectMap = new HashMap<>();
+        arrayMap = new HashMap<>();
+    }
 
     public QONObject(File file) throws IOException, UntrustedQONException {
-        map = new HashMap<>();
+        this();
 
+        List<String> lines = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                if (!isCommentOuted(line)) {
-                    if (isObject(line)) {
+                lines.add(line);
+            }
+        }
 
-                    } else if (isArray(line)) {
+        init(lines.toArray(new String[0]));
+    }
 
-                    }else if (isValue(line)) {
-                        String[] strings = line.split("=", 2);
-                        String key = strings[0];
-                        String value = strings[1];
-                        map.put(key, value);
-                    } else {
-                        throw new UntrustedQONException("no equal sign.");
+    public QONObject(String[] lines) throws UntrustedQONException {
+        this();
+
+        init(lines);
+    }
+
+
+    public QONObject getQONObject(String key) {
+        return objectMap.get(key);
+    }
+
+    public QONArray getQONArray(String key) {
+        return arrayMap.get(key);
+    }
+
+    public String get(String key) {
+        return valueMap.get(key);
+    }
+
+
+    private void init(String[] lines) throws UntrustedQONException {
+        boolean object = false, array = false;
+        int indent = 0;
+        int objectStartIndex = 0, arrayStartIndex = 0;
+
+        for (int i = 0; i < lines.length; i++) {
+            String line = lines[i];
+            if (!isCommentOuted(line) && !line.isEmpty()) {
+                if (object) {
+                    if (isObjectEnd(line)) {
+                        indent--;
+                        if (indent == 0) {
+                            object = false;
+                            objectMap.put(lines[objectStartIndex].substring(0, lines[objectStartIndex].length() - 1), new QONObject(Arrays.copyOfRange(lines, objectStartIndex + 1, i)));
+                        }
+                    } else if (isObjectStart(line)) {
+                        indent++;
                     }
+                } else if (array) {
+                    if (isArrayEnd(line)) {
+                        indent--;
+                        if (indent == 0) {
+                            array = false;
+                            arrayMap.put(lines[arrayStartIndex].substring(0, lines[arrayStartIndex].length() - 1), new QONArray(Arrays.copyOfRange(lines, arrayStartIndex + 1, i)));
+                        }
+                    } else if (isArrayStart(line)) {
+                        indent++;
+                    }
+                } else if (isObjectStart(line)) {
+                    object = true;
+                    objectStartIndex = i;
+                    indent++;
+                } else if (isArrayStart(line)) {
+                    array = true;
+                    arrayStartIndex = i;
+                    indent++;
+                } else if (isValue(line)) {
+                    String[] strings = line.split("=", 2);
+                    String key = strings[0];
+                    String value = strings[1];
+                    valueMap.put(key, value);
+                } else {
+                    throw new UntrustedQONException("no equal sign.");
                 }
             }
         }
+        if (object || array) throw new UntrustedQONException("extra indent.");
     }
-    public String getProperty(String key) {
-        return map.get(key);
-    }
-
 
     private boolean isCommentOuted(String target) {
         return target.startsWith("#");
     }
-    private boolean isObject(String target){
+
+    private boolean isObjectStart(String target) {
         return target.endsWith("{");
     }
-    private boolean isArray(String target){
+
+    private boolean isObjectEnd(String target) {
+        return target.equals("}");
+    }
+
+    private boolean isArrayStart(String target) {
         return target.endsWith("[");
     }
-    private boolean isValue(String target){
+
+    private boolean isArrayEnd(String target) {
+        return target.equals("]");
+    }
+
+    private boolean isValue(String target) {
         return target.contains("=");
     }
 }

@@ -1,5 +1,8 @@
 package com.qow.util.qon;
 
-public class QONArray {
+public record QONArray(String[] list) {
 
+    public String get(int index) {
+        return list[index];
+    }
 }
