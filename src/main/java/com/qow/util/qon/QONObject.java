@@ -7,7 +7,7 @@ import java.util.*;
 /**
  * qon(Qow Object Notation)の読み込みをする<br>
  *
- * @version 2025/08/20
+ * @version 2025/09/23
  * @since 1.0.0
  */
 public class QONObject {
@@ -58,7 +58,7 @@ public class QONObject {
      * キーに対応する{@link QONObject}を返す。
      *
      * @param key キー
-     * @return キーに対応する{@link QONObject}
+     * @return キーに対応するQONObject
      */
     public QONObject getQONObject(String key) {
         return objectMap.get(key);
@@ -68,7 +68,7 @@ public class QONObject {
      * キーに対応する{@link QONArray}を返す。
      *
      * @param key キー
-     * @return キーに対応する{@link QONArray}
+     * @return キーに対応するQONArray
      */
     public QONArray getQONArray(String key) {
         return arrayMap.get(key);
@@ -85,6 +85,10 @@ public class QONObject {
     }
 
     private void init(String[] lines) throws UntrustedQONException {
+        for (int i = 0; i < lines.length; i++) {
+            lines[i] = lines[i].replace(" ", "").replace("\t", "");
+        }
+
         boolean object = false, array = false;
         int indent = 0;
         int objectStartIndex = 0, arrayStartIndex = 0;
