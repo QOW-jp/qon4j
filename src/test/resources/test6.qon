@@ -1,0 +1,12 @@
+first=1first
+middle=-
+second=2second
+1st=$[first]
+total=name=$[first]1$[middle]$[second]2
+object{
+    son_object{
+    }
+}
+list[
+]
+separate=-----------------------
