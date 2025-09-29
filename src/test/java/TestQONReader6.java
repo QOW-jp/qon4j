@@ -13,6 +13,8 @@ public class TestQONReader6 {
         String[] targets = {"first", "middle", "second","separate"};
         print(qon,targets);
 
+        String[] tar2 = {"1st", "total","separate"};
+        print(qon,tar2);
 
 
         QONObject object = qon.getQONObject("object");

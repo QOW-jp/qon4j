@@ -3,6 +3,8 @@ package com.qow.util.qon;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * qon(Qow Object Notation)の読み込みをする<br>
@@ -14,6 +16,7 @@ public class QONObject {
     private final Map<String, String> valueMap;
     private final Map<String, QONObject> objectMap;
     private final Map<String, QONArray> arrayMap;
+    private QONObject parentQONObject;
 
     private QONObject() {
         valueMap = new HashMap<>();
@@ -52,6 +55,9 @@ public class QONObject {
         this();
 
         init(lines);
+    }
+    protected void setParentQONObject(QONObject parentQONObject){
+        this.parentQONObject=parentQONObject;
     }
 
     /**
@@ -124,13 +130,38 @@ public class QONObject {
                     String[] strings = line.split("=", 2);
                     String key = strings[0];
                     String value = strings[1];
-                    valueMap.put(key, value);
+                    if (hasVariable(value)) {
+                        Pattern pattern = Pattern.compile("\\$\\(([^)]*)\\)");
+                        Matcher matcher = pattern.matcher(line);
+
+                        List<String> matchList = new ArrayList<>();
+                        while (matcher.find()) {
+                            matchList.add(matcher.group(1));
+                        }
+                        String replacedLine = line;
+                        for (String match : matchList) {
+                            replacedLine = replacedLine.replaceAll("\\$(" + match + ")", getMatchedVariable(match));
+                        }
+                    } else {
+                        valueMap.put(key, value);
+                    }
                 } else {
                     throw new UntrustedQONException("no equal sign.");
                 }
             }
         }
         if (object || array) throw new UntrustedQONException("extra indent.");
+    }
+
+    private String getMatchedVariable(String key) {
+        if (valueMap.containsKey(key)) {
+
+        } else {
+            if(parentQONObject==null){
+
+            }
+            String replace = parentQONObject.getMatchedVariable(key);
+        }
     }
 
     private boolean isCommentOuted(String target) {
@@ -159,5 +190,9 @@ public class QONObject {
 
     private boolean isValue(String target) {
         return target.contains("=");
+    }
+
+    private boolean hasVariable(String target) {
+        return target.contains("$(") && target.contains(")");
     }
 }
