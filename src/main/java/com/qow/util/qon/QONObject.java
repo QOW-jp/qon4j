@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 /**
  * qon(Qow Object Notation)の読み込みをする<br>
  *
- * @version 2025/09/23
+ * @version 2025/09/30
  * @since 1.0.0
  */
 public class QONObject {
@@ -56,8 +56,19 @@ public class QONObject {
 
         init(lines);
     }
-    protected void setParentQONObject(QONObject parentQONObject){
-        this.parentQONObject=parentQONObject;
+
+    /**
+     * qon構文に従った配列からqonを読み込む。
+     *
+     * @param parentQONObject 親オブジェクト
+     * @param lines           qonドキュメント
+     * @throws UntrustedQONException qon構文に不備がある場合
+     */
+    public QONObject(QONObject parentQONObject, String[] lines) throws UntrustedQONException {
+        this();
+        this.parentQONObject = parentQONObject;
+
+        init(lines);
     }
 
     /**
@@ -107,7 +118,7 @@ public class QONObject {
                         indent--;
                         if (indent == 0) {
                             object = false;
-                            objectMap.put(lines[objectStartIndex].substring(0, lines[objectStartIndex].length() - 1), new QONObject(Arrays.copyOfRange(lines, objectStartIndex + 1, i)));
+                            objectMap.put(lines[objectStartIndex].substring(0, lines[objectStartIndex].length() - 1), new QONObject(this, Arrays.copyOfRange(lines, objectStartIndex + 1, i)));
                         }
                     } else if (isObjectStart(line)) {
                         indent++;
@@ -132,16 +143,20 @@ public class QONObject {
                     String value = strings[1];
                     if (hasVariable(value)) {
                         Pattern pattern = Pattern.compile("\\$\\(([^)]*)\\)");
-                        Matcher matcher = pattern.matcher(line);
+                        Matcher matcher = pattern.matcher(value);
 
                         List<String> matchList = new ArrayList<>();
                         while (matcher.find()) {
                             matchList.add(matcher.group(1));
                         }
-                        String replacedLine = line;
+                        String replacedValue = value;
                         for (String match : matchList) {
-                            replacedLine = replacedLine.replaceAll("\\$(" + match + ")", getMatchedVariable(match));
+                            try {
+                                replacedValue = replacedValue.replaceFirst("\\$\\(" + match + "\\)", getMatchedVariable(match));
+                            } catch (IllegalArgumentException ignored) {
+                            }
                         }
+                        valueMap.put(key, replacedValue);
                     } else {
                         valueMap.put(key, value);
                     }
@@ -155,12 +170,13 @@ public class QONObject {
 
     private String getMatchedVariable(String key) {
         if (valueMap.containsKey(key)) {
-
+            return valueMap.get(key);
         } else {
-            if(parentQONObject==null){
-
+            if (parentQONObject == null) {
+                return "$(" + key + ")";
+            } else {
+                return parentQONObject.getMatchedVariable(key);
             }
-            String replace = parentQONObject.getMatchedVariable(key);
         }
     }
 

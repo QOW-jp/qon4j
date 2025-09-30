@@ -4,9 +4,14 @@ second=2second
 1st=$(first)
 total=name=$(first)1$(middle)$(second)2
 object{
+    son=$(total)
     son_object{
+        sonson = $(son)-$(first)
     }
 }
 list[
 ]
 separate=-----------------------
+sep=$(separate)
+separate================
+sep=$()
