@@ -126,7 +126,13 @@ public class QONObject {
                 } else if (array) {
                     if (isArrayEnd(line)) {
                         array = false;
-                        arrayMap.put(lines[arrayStartIndex].substring(0, lines[arrayStartIndex].length() - 1), new QONArray(Arrays.copyOfRange(lines, arrayStartIndex + 1, i)));
+                        String[] absoluteLines = Arrays.copyOfRange(lines, arrayStartIndex + 1, i);
+                        for (int j = 0; j < absoluteLines.length; j++) {
+                            if (hasVariable(absoluteLines[j])) {
+                                absoluteLines[j] = getAbsoluteVariable(absoluteLines[j]);
+                            }
+                        }
+                        arrayMap.put(lines[arrayStartIndex].substring(0, lines[arrayStartIndex].length() - 1), new QONArray(absoluteLines));
                     } else if (isArrayStart(line) || isObjectStart(line)) {
                         throw new UntrustedQONException("multiple array.");
                     }
@@ -142,21 +148,7 @@ public class QONObject {
                     String key = strings[0];
                     String value = strings[1];
                     if (hasVariable(value)) {
-                        Pattern pattern = Pattern.compile("\\$\\(([^)]*)\\)");
-                        Matcher matcher = pattern.matcher(value);
-
-                        List<String> matchList = new ArrayList<>();
-                        while (matcher.find()) {
-                            matchList.add(matcher.group(1));
-                        }
-                        String replacedValue = value;
-                        for (String match : matchList) {
-                            try {
-                                replacedValue = replacedValue.replaceFirst("\\$\\(" + match + "\\)", getMatchedVariable(match));
-                            } catch (IllegalArgumentException ignored) {
-                            }
-                        }
-                        valueMap.put(key, replacedValue);
+                        valueMap.put(key, getAbsoluteVariable(value));
                     } else {
                         valueMap.put(key, value);
                     }
@@ -166,6 +158,24 @@ public class QONObject {
             }
         }
         if (object || array) throw new UntrustedQONException("extra indent.");
+    }
+
+    private String getAbsoluteVariable(String value) {
+        Pattern pattern = Pattern.compile("\\$\\(([^)]*)\\)");
+        Matcher matcher = pattern.matcher(value);
+
+        List<String> matchList = new ArrayList<>();
+        while (matcher.find()) {
+            matchList.add(matcher.group(1));
+        }
+        String replacedValue = value;
+        for (String match : matchList) {
+            try {
+                replacedValue = replacedValue.replaceFirst("\\$\\(" + match + "\\)", getMatchedVariable(match));
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+        return replacedValue;
     }
 
     private String getMatchedVariable(String key) {

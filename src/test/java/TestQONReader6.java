@@ -1,3 +1,4 @@
+import com.qow.util.qon.QONArray;
 import com.qow.util.qon.QONObject;
 import com.qow.util.qon.UntrustedQONException;
 
@@ -25,6 +26,11 @@ public class TestQONReader6 {
         String[] targets3 = {"sonson"};
         for (String target : targets3) {
             System.out.printf("son_%s=%s\n", target, son.get(target));
+        }
+
+        QONArray list = qon.getQONArray("list");
+        for (String member : list.list()) {
+            System.out.println("list:" + member);
         }
     }
 
