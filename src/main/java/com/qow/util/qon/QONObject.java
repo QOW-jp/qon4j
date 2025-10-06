@@ -1,7 +1,9 @@
 package com.qow.util.qon;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -9,10 +11,11 @@ import java.util.regex.Pattern;
 /**
  * qon(Qow Object Notation)の読み込みをする<br>
  *
- * @version 2025/09/30
+ * @version 2025/10/06
  * @since 1.0.0
  */
 public class QONObject {
+    private static final Pattern VARIABLE_PATTERN = Pattern.compile("\\$\\(([^)]*)\\)");
     private final Map<String, String> valueMap;
     private final Map<String, QONObject> objectMap;
     private final Map<String, QONArray> arrayMap;
@@ -34,13 +37,7 @@ public class QONObject {
     public QONObject(File file) throws IOException, UntrustedQONException {
         this();
 
-        List<String> lines = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                lines.add(line);
-            }
-        }
+        List<String> lines = Files.readAllLines(file.toPath(), StandardCharsets.UTF_8);
 
         init(lines.toArray(new String[0]));
     }
@@ -153,7 +150,7 @@ public class QONObject {
                         valueMap.put(key, value);
                     }
                 } else {
-                    throw new UntrustedQONException("no value.");
+                    throw new UntrustedQONException("Invalid line at " + i + " : " + line);
                 }
             }
         }
@@ -161,8 +158,7 @@ public class QONObject {
     }
 
     private String getAbsoluteVariable(String value) {
-        Pattern pattern = Pattern.compile("\\$\\(([^)]*)\\)");
-        Matcher matcher = pattern.matcher(value);
+        Matcher matcher = VARIABLE_PATTERN.matcher(value);
 
         List<String> matchList = new ArrayList<>();
         while (matcher.find()) {
@@ -171,7 +167,7 @@ public class QONObject {
         String replacedValue = value;
         for (String match : matchList) {
             try {
-                replacedValue = replacedValue.replaceFirst("\\$\\(" + match + "\\)", getMatchedVariable(match));
+                replacedValue = replacedValue.replaceFirst("\\$\\(" + Pattern.quote(match) + "\\)", getMatchedVariable(match));
             } catch (IllegalArgumentException ignored) {
             }
         }
