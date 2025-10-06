@@ -25,6 +25,7 @@ public class QONObject {
         valueMap = new HashMap<>();
         objectMap = new HashMap<>();
         arrayMap = new HashMap<>();
+        parentQONObject = null;
     }
 
     /**
@@ -109,49 +110,49 @@ public class QONObject {
 
         for (int i = 0; i < lines.length; i++) {
             String line = lines[i];
-            if (!isCommentOuted(line) && !isNoMean(line)) {
-                if (object) {
-                    if (isObjectEnd(line)) {
-                        indent--;
-                        if (indent == 0) {
-                            object = false;
-                            objectMap.put(lines[objectStartIndex].substring(0, lines[objectStartIndex].length() - 1), new QONObject(this, Arrays.copyOfRange(lines, objectStartIndex + 1, i)));
-                        }
-                    } else if (isObjectStart(line)) {
-                        indent++;
-                    }
-                } else if (array) {
-                    if (isArrayEnd(line)) {
-                        array = false;
-                        String[] absoluteLines = Arrays.copyOfRange(lines, arrayStartIndex + 1, i);
-                        for (int j = 0; j < absoluteLines.length; j++) {
-                            if (hasVariable(absoluteLines[j])) {
-                                absoluteLines[j] = getAbsoluteVariable(absoluteLines[j]);
-                            }
-                        }
-                        arrayMap.put(lines[arrayStartIndex].substring(0, lines[arrayStartIndex].length() - 1), new QONArray(absoluteLines));
-                    } else if (isArrayStart(line) || isObjectStart(line)) {
-                        throw new UntrustedQONException("multiple array.");
+            if (isCommentOuted(line) || isNoMean(line)) continue;
+
+            if (object) {
+                if (isObjectEnd(line)) {
+                    indent--;
+                    if (indent == 0) {
+                        object = false;
+                        objectMap.put(lines[objectStartIndex].substring(0, lines[objectStartIndex].length() - 1), new QONObject(this, Arrays.copyOfRange(lines, objectStartIndex + 1, i)));
                     }
                 } else if (isObjectStart(line)) {
-                    object = true;
-                    objectStartIndex = i;
                     indent++;
-                } else if (isArrayStart(line)) {
-                    array = true;
-                    arrayStartIndex = i;
-                } else if (isValue(line)) {
-                    String[] strings = line.split("=", 2);
-                    String key = strings[0];
-                    String value = strings[1];
-                    if (hasVariable(value)) {
-                        valueMap.put(key, getAbsoluteVariable(value));
-                    } else {
-                        valueMap.put(key, value);
-                    }
-                } else {
-                    throw new UntrustedQONException("Invalid line at " + i + " : " + line);
                 }
+            } else if (array) {
+                if (isArrayEnd(line)) {
+                    array = false;
+                    String[] absoluteLines = Arrays.copyOfRange(lines, arrayStartIndex + 1, i);
+                    for (int j = 0; j < absoluteLines.length; j++) {
+                        if (hasVariable(absoluteLines[j])) {
+                            absoluteLines[j] = getAbsoluteVariable(absoluteLines[j]);
+                        }
+                    }
+                    arrayMap.put(lines[arrayStartIndex].substring(0, lines[arrayStartIndex].length() - 1), new QONArray(absoluteLines));
+                } else if (isArrayStart(line) || isObjectStart(line)) {
+                    throw new UntrustedQONException("multiple array at " + i + ": " + line);
+                }
+            } else if (isObjectStart(line)) {
+                object = true;
+                objectStartIndex = i;
+                indent++;
+            } else if (isArrayStart(line)) {
+                array = true;
+                arrayStartIndex = i;
+            } else if (isValue(line)) {
+                String[] strings = line.split("=", 2);
+                String key = strings[0];
+                String value = strings[1];
+                if (hasVariable(value)) {
+                    valueMap.put(key, getAbsoluteVariable(value));
+                } else {
+                    valueMap.put(key, value);
+                }
+            } else {
+                throw new UntrustedQONException("Invalid line at " + i + ": " + line);
             }
         }
         if (object || array) throw new UntrustedQONException("extra indent.");
