@@ -3,6 +3,7 @@ middle=-
 second=2second
 1st=$(first)
 total=name=$(first)1$(middle)$(second)2
+space=$(first) space
 object{
     son=$(total)
     son_object{

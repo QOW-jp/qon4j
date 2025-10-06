@@ -103,7 +103,7 @@ public class QONObject {
 
     private void init(String[] lines) throws UntrustedQONException {
         for (int i = 0; i < lines.length; i++) {
-            lines[i] = lines[i].replace(" ", "").replace("\t", "");
+            lines[i] = lines[i].replaceFirst("^\\s+", "");
         }
 
         boolean object = false, array = false;
@@ -153,7 +153,7 @@ public class QONObject {
                         valueMap.put(key, value);
                     }
                 } else {
-                    throw new UntrustedQONException("no equal sign.");
+                    throw new UntrustedQONException("no value.");
                 }
             }
         }

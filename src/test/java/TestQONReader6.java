@@ -10,7 +10,7 @@ public class TestQONReader6 {
         File file = new File("src/test/resources/test6.qon");
         QONObject qon = new QONObject(file);
 
-        String[] targets = {"first", "middle", "second", "separate"};
+        String[] targets = {"first", "middle", "second","space", "separate"};
         print(qon, targets);
 
         String[] tar2 = {"1st", "total", "sep"};
