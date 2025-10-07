@@ -1,3 +1,4 @@
+import com.qow.util.qon.NoSuchKeyException;
 import com.qow.util.qon.QONArray;
 import com.qow.util.qon.QONObject;
 import com.qow.util.qon.UntrustedQONException;
@@ -6,7 +7,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class TestQONReader6 {
-    public static void main(String[] args) throws UntrustedQONException, IOException {
+    public static void main(String[] args) throws UntrustedQONException, IOException, NoSuchKeyException {
         File file = new File("src/test/resources/test6.qon");
         QONObject qon = new QONObject(file);
 
@@ -34,7 +35,7 @@ public class TestQONReader6 {
         }
     }
 
-    public static void print(QONObject qon, String[] targets) {
+    public static void print(QONObject qon, String[] targets) throws NoSuchKeyException {
         for (String target : targets) {
             System.out.printf("%s=%s\n", target, qon.get(target));
         }

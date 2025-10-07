@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 /**
  * qon(Qow Object Notation)の読み込みをする<br>
  *
- * @version 2025/10/06
+ * @version 2025/10/07
  * @since 1.0.0
  */
 public class QONObject {
@@ -74,9 +74,14 @@ public class QONObject {
      *
      * @param key キー
      * @return キーに対応するQONObject
+     * @throws NoSuchKeyException キーが存在しなかった場合
      */
-    public QONObject getQONObject(String key) {
-        return objectMap.get(key);
+    public QONObject getQONObject(String key) throws NoSuchKeyException {
+        if (objectMap.containsKey(key)) {
+            return objectMap.get(key);
+        } else {
+            throw new NoSuchKeyException("not exist key.", key);
+        }
     }
 
     /**
@@ -84,9 +89,14 @@ public class QONObject {
      *
      * @param key キー
      * @return キーに対応するQONArray
+     * @throws NoSuchKeyException キーが存在しなかった場合
      */
-    public QONArray getQONArray(String key) {
-        return arrayMap.get(key);
+    public QONArray getQONArray(String key) throws NoSuchKeyException {
+        if (arrayMap.containsKey(key)) {
+            return arrayMap.get(key);
+        } else {
+            throw new NoSuchKeyException("not exist key.", key);
+        }
     }
 
     /**
@@ -94,9 +104,14 @@ public class QONObject {
      *
      * @param key キー
      * @return キーに対応する値
+     * @throws NoSuchKeyException キーが存在しなかった場合
      */
-    public String get(String key) {
-        return valueMap.get(key);
+    public String get(String key) throws NoSuchKeyException {
+        if (valueMap.containsKey(key)) {
+            return valueMap.get(key);
+        } else {
+            throw new NoSuchKeyException("not exist key.", key);
+        }
     }
 
     /**
