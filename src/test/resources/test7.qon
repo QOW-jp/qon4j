@@ -4,6 +4,7 @@ second=2second
 1st=$(first)
 total=name=$(first)1$(middle)$(second)2
 space=$(first) space
+sp ce=space s
 object{
     son=$(total)
     son_object{

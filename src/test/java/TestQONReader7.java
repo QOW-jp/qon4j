@@ -22,7 +22,7 @@ public class TestQONReader7 {
         System.out.println(goalMilliTime - startMilliTime + "ms");
 
 
-        String[] targets = {"first", "middle", "second", "space", "separate"};
+        String[] targets = {"first", "middle", "second", "space", "sp ce", "separate"};
         print(qon, targets);
 
         String[] tar2 = {"1st", "total", "sep"};
