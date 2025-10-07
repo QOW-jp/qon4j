@@ -99,6 +99,33 @@ public class QONObject {
         return valueMap.get(key);
     }
 
+    /**
+     * 変数のキーリストを返す
+     *
+     * @return キーリスト
+     */
+    public String[] getValueKeyList() {
+        return valueMap.keySet().toArray(new String[0]);
+    }
+
+    /**
+     * {@link QONObject}のキーリストを返す
+     *
+     * @return キーリスト
+     */
+    public String[] getQONObjectKeyList() {
+        return objectMap.keySet().toArray(new String[0]);
+    }
+
+    /**
+     * {@link QONArray}のキーリストを返す
+     *
+     * @return キーリスト
+     */
+    public String[] getQONArrayKeyList() {
+        return arrayMap.keySet().toArray(new String[0]);
+    }
+
     private void init(String[] lines) throws UntrustedQONException {
         for (int i = 0; i < lines.length; i++) {
             lines[i] = lines[i].replaceFirst("^\\s+", "");
