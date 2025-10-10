@@ -4,7 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -141,66 +144,24 @@ public class QONObject {
         return arrayMap.keySet().toArray(new String[0]);
     }
 
-    private void init(String[] lines) throws UntrustedQONException {
-        for (int i = 0; i < lines.length; i++) {
-            lines[i] = lines[i].replaceFirst("^\\s+", "");
-        }
-
-        boolean object = false, array = false;
-        int indent = 0;
-        int objectStartIndex = 0, arrayStartIndex = 0;
-
-        for (int i = 0; i < lines.length; i++) {
-            String line = lines[i];
-            if (isCommentOuted(line) || isNoMean(line)) continue;
-
-            if (object) {
-                if (isObjectEnd(line)) {
-                    indent--;
-                    if (indent == 0) {
-                        object = false;
-                        objectMap.put(lines[objectStartIndex].substring(0, lines[objectStartIndex].length() - 1), new QONObject(this, Arrays.copyOfRange(lines, objectStartIndex + 1, i)));
-                    }
-                } else if (isObjectStart(line)) {
-                    indent++;
-                }
-            } else if (array) {
-                if (isArrayEnd(line)) {
-                    array = false;
-                    String[] absoluteLines = Arrays.copyOfRange(lines, arrayStartIndex + 1, i);
-                    for (int j = 0; j < absoluteLines.length; j++) {
-                        if (hasVariable(absoluteLines[j])) {
-                            absoluteLines[j] = getAbsoluteVariable(absoluteLines[j]);
-                        }
-                    }
-                    arrayMap.put(lines[arrayStartIndex].substring(0, lines[arrayStartIndex].length() - 1), new QONArray(absoluteLines));
-                } else if (isArrayStart(line) || isObjectStart(line)) {
-                    throw new UntrustedQONException("multiple array at " + i + ": " + line);
-                }
-            } else if (isObjectStart(line)) {
-                object = true;
-                objectStartIndex = i;
-                indent++;
-            } else if (isArrayStart(line)) {
-                array = true;
-                arrayStartIndex = i;
-            } else if (isValue(line)) {
-                String[] strings = line.split("=", 2);
-                String key = strings[0];
-                String value = strings[1];
-                if (hasVariable(value)) {
-                    valueMap.put(key, getAbsoluteVariable(value));
-                } else {
-                    valueMap.put(key, value);
-                }
-            } else {
-                throw new UntrustedQONException("Invalid line at " + i + ": " + line);
-            }
-        }
-        if (object || array) throw new UntrustedQONException("extra indent.");
+    protected void putValue(String key, String value) {
+        valueMap.put(key, value);
     }
 
-    private String getAbsoluteVariable(String value) {
+    protected void putObject(String key, QONObject qonObject) {
+        objectMap.put(key, qonObject);
+
+    }
+
+    protected void putArray(String key, QONArray qonArray) {
+        arrayMap.put(key, qonArray);
+    }
+
+    private void init(String[] lines) throws UntrustedQONException {
+        new QONParser(this).parse(lines);
+    }
+
+    protected String getAbsoluteVariable(String value) {
         Matcher matcher = VARIABLE_PATTERN.matcher(value);
 
         List<String> matchList = new ArrayList<>();
@@ -217,7 +178,7 @@ public class QONObject {
         return replacedValue;
     }
 
-    private String getMatchedVariable(String key) {
+    protected String getMatchedVariable(String key) {
         if (valueMap.containsKey(key)) {
             return valueMap.get(key);
         } else {
@@ -227,37 +188,5 @@ public class QONObject {
                 return parentQONObject.getMatchedVariable(key);
             }
         }
-    }
-
-    private boolean isCommentOuted(String target) {
-        return target.startsWith("#");
-    }
-
-    private boolean isNoMean(String target) {
-        return target.isBlank();
-    }
-
-    private boolean isObjectStart(String target) {
-        return target.endsWith("{");
-    }
-
-    private boolean isObjectEnd(String target) {
-        return target.equals("}");
-    }
-
-    private boolean isArrayStart(String target) {
-        return target.endsWith("[");
-    }
-
-    private boolean isArrayEnd(String target) {
-        return target.equals("]");
-    }
-
-    private boolean isValue(String target) {
-        return target.contains("=");
-    }
-
-    private boolean hasVariable(String target) {
-        return target.contains("$(") && target.contains(")");
     }
 }
