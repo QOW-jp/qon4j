@@ -9,7 +9,7 @@ import java.io.IOException;
 public class TestQONReader7 {
     public TestQONReader7(String pathname) throws UntrustedQONException, IOException, NoSuchKeyException {
         File file = new File(pathname);
-        int trials = 5;
+        int trials = 10000;
         QONObject qon = null;
 //        long startNanoTime = System.nanoTime();
         long startMilliTime = System.currentTimeMillis();

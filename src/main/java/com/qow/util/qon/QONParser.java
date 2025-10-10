@@ -3,16 +3,22 @@ package com.qow.util.qon;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
-public class QONParser {
+record QONParser(QONObject target) {
     private static final Pattern VARIABLE_PATTERN = Pattern.compile("\\$\\(([^)]*)\\)");
 
-    private final QONObject target;
-
-    protected QONParser(QONObject target) {
+    QONParser(QONObject target) {
         this.target = target;
     }
 
-    public void parse(String[] lines) throws UntrustedQONException {
+    public static String getRelativeVariable(String key) {
+        return "$(" + key + ")";
+    }
+
+    public static String getMatchedVariable(String match) {
+        return "\\$\\(" + Pattern.quote(match) + "\\)";
+    }
+
+    void parse(String[] lines) throws UntrustedQONException {
         for (int i = 0; i < lines.length; i++) {
             lines[i] = lines[i].replaceFirst("^\\s+", "");
         }

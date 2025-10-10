@@ -171,7 +171,7 @@ public class QONObject {
         String replacedValue = value;
         for (String match : matchList) {
             try {
-                replacedValue = replacedValue.replaceFirst("\\$\\(" + Pattern.quote(match) + "\\)", getMatchedVariable(match));
+                replacedValue = replacedValue.replaceFirst(QONParser.getMatchedVariable(match), getMatchedVariable(match));
             } catch (IllegalArgumentException ignored) {
             }
         }
@@ -183,7 +183,7 @@ public class QONObject {
             return valueMap.get(key);
         } else {
             if (parentQONObject == null) {
-                return "$(" + key + ")";
+                return QONParser.getRelativeVariable(key);
             } else {
                 return parentQONObject.getMatchedVariable(key);
             }
