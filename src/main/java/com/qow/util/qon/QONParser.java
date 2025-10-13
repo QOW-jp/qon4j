@@ -4,18 +4,13 @@ import java.util.Arrays;
 import java.util.regex.Pattern;
 
 record QONParser(QONObject target) {
-    private static final Pattern VARIABLE_PATTERN = Pattern.compile("\\$\\(([^)]*)\\)");
+    static final String VARIABLE_START = Pattern.quote("$(");
+    static final String VARIABLE_END = Pattern.quote(")");
+
+    static final Pattern VARIABLE_PATTERN = Pattern.compile(VARIABLE_START + "([^)]*)" + VARIABLE_END);
 
     QONParser(QONObject target) {
         this.target = target;
-    }
-
-    public static String getRelativeVariable(String key) {
-        return "$(" + key + ")";
-    }
-
-    public static String getMatchedVariable(String match) {
-        return "\\$\\(" + Pattern.quote(match) + "\\)";
     }
 
     void parse(String[] lines) throws UntrustedQONException {

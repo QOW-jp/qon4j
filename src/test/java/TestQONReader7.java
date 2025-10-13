@@ -11,16 +11,12 @@ public class TestQONReader7 {
         File file = new File(pathname);
         int trials = 10000;
         QONObject qon = null;
-//        long startNanoTime = System.nanoTime();
         long startMilliTime = System.currentTimeMillis();
         for (int i = 0; i < trials; i++) {
             qon = new QONObject(file);
         }
-//        long goalNanoTime = System.nanoTime();
         long goalMilliTime = System.currentTimeMillis();
-//        System.out.println(goalNanoTime - startNanoTime + "ns");
         System.out.println(goalMilliTime - startMilliTime + "ms");
-
 
         String[] targets = {"first", "middle", "second", "space", "sp ce", "separate"};
         print(qon, targets);

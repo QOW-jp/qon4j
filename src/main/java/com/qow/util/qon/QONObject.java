@@ -18,7 +18,6 @@ import java.util.regex.Pattern;
  * @since 1.0.0
  */
 public class QONObject {
-    private static final Pattern VARIABLE_PATTERN = Pattern.compile("\\$\\(([^)]*)\\)");
     private final Map<String, String> valueMap;
     private final Map<String, QONObject> objectMap;
     private final Map<String, QONArray> arrayMap;
@@ -162,7 +161,7 @@ public class QONObject {
     }
 
     protected String getAbsoluteVariable(String value) {
-        Matcher matcher = VARIABLE_PATTERN.matcher(value);
+        Matcher matcher = QONParser.VARIABLE_PATTERN.matcher(value);
 
         List<String> matchList = new ArrayList<>();
         while (matcher.find()) {
@@ -171,7 +170,9 @@ public class QONObject {
         String replacedValue = value;
         for (String match : matchList) {
             try {
-                replacedValue = replacedValue.replaceFirst(QONParser.getMatchedVariable(match), getMatchedVariable(match));
+                String regex = "\\$\\(" + Pattern.quote(match) + "\\)";
+                String replacement = getMatchedVariable(match);
+                replacedValue = replacedValue.replaceFirst(regex, replacement);
             } catch (IllegalArgumentException ignored) {
             }
         }
@@ -183,7 +184,7 @@ public class QONObject {
             return valueMap.get(key);
         } else {
             if (parentQONObject == null) {
-                return QONParser.getRelativeVariable(key);
+                return "$(" + key + ")";
             } else {
                 return parentQONObject.getMatchedVariable(key);
             }
