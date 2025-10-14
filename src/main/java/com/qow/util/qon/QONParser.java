@@ -4,10 +4,18 @@ import java.util.Arrays;
 import java.util.regex.Pattern;
 
 record QONParser(QONObject target) {
-    static final String VARIABLE_START = Pattern.quote("$(");
-    static final String VARIABLE_END = Pattern.quote(")");
+    static final String COMMENT_LINE = "#";
+    static final String OBJECT_START = "{";
+    static final String OBJECT_END = "}";
+    static final String ARRAY_START = "[";
+    static final String ARRAY_END = "]";
+    static final String VARIABLE_SPLIT = "=";
+    static final String VARIABLE_START = "$(";
+    static final String VARIABLE_END = ")";
+    static final int OBJECT_KEY_INDEX = OBJECT_START.length();
+    static final int ARRAY_KEY_INDEX = ARRAY_START.length();
 
-    static final Pattern VARIABLE_PATTERN = Pattern.compile(VARIABLE_START + "([^)]*)" + VARIABLE_END);
+    static final Pattern VARIABLE_PATTERN = Pattern.compile(Pattern.quote(VARIABLE_START) + "([^)]*)" + Pattern.quote(VARIABLE_END));
 
     QONParser(QONObject target) {
         this.target = target;
@@ -31,7 +39,7 @@ record QONParser(QONObject target) {
                     indent--;
                     if (indent == 0) {
                         object = false;
-                        String key = lines[objectStartIndex].substring(0, lines[objectStartIndex].length() - 1);
+                        String key = lines[objectStartIndex].substring(0, lines[objectStartIndex].length() - OBJECT_KEY_INDEX);
                         target.putObject(key, new QONObject(target, Arrays.copyOfRange(lines, objectStartIndex + 1, i)));
                     }
                 } else if (isObjectStart(line)) {
@@ -46,7 +54,7 @@ record QONParser(QONObject target) {
                             absoluteLines[j] = target.getAbsoluteVariable(absoluteLines[j]);
                         }
                     }
-                    String key = lines[arrayStartIndex].substring(0, lines[arrayStartIndex].length() - 1);
+                    String key = lines[arrayStartIndex].substring(0, lines[arrayStartIndex].length() - ARRAY_KEY_INDEX);
                     target.putArray(key, new QONArray(absoluteLines));
                 } else if (isArrayStart(line) || isObjectStart(line)) {
                     throw new UntrustedQONException("multiple array at " + i + ": " + line);
@@ -59,7 +67,7 @@ record QONParser(QONObject target) {
                 array = true;
                 arrayStartIndex = i;
             } else if (isValue(line)) {
-                String[] strings = line.split("=", 2);
+                String[] strings = line.split(VARIABLE_SPLIT, 2);
                 String key = strings[0];
                 String value = strings[1];
                 if (hasVariable(value)) {
@@ -75,7 +83,7 @@ record QONParser(QONObject target) {
     }
 
     private boolean isCommentOuted(String target) {
-        return target.startsWith("#");
+        return target.startsWith(COMMENT_LINE);
     }
 
     private boolean isNoMean(String target) {
@@ -83,26 +91,26 @@ record QONParser(QONObject target) {
     }
 
     private boolean isObjectStart(String target) {
-        return target.endsWith("{");
+        return target.endsWith(OBJECT_START);
     }
 
     private boolean isObjectEnd(String target) {
-        return target.equals("}");
+        return target.equals(OBJECT_END);
     }
 
     private boolean isArrayStart(String target) {
-        return target.endsWith("[");
+        return target.endsWith(ARRAY_START);
     }
 
     private boolean isArrayEnd(String target) {
-        return target.equals("]");
+        return target.equals(ARRAY_END);
     }
 
     private boolean isValue(String target) {
-        return target.contains("=");
+        return target.contains(VARIABLE_SPLIT);
     }
 
     private boolean hasVariable(String target) {
-        return target.contains("$(") && target.contains(")");
+        return target.contains(VARIABLE_START) && target.contains(VARIABLE_END);
     }
 }
