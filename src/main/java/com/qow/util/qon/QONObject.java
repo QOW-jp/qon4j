@@ -12,9 +12,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * qon(Qow Object Notation)の読み込みをする<br>
+ * qon(Qow Object Notation)の読み込みをする。
  *
- * @version 2025/10/07
+ * @version 2025/12/23
  * @since 1.0.0
  */
 public class QONObject {
@@ -75,7 +75,7 @@ public class QONObject {
      * キーに対応する{@link QONObject}を返す。
      *
      * @param key キー
-     * @return キーに対応するQONObject
+     * @return キーに対応する{@link QONObject}
      * @throws NoSuchKeyException キーが存在しなかった場合
      */
     public QONObject getQONObject(String key) throws NoSuchKeyException {
@@ -90,7 +90,7 @@ public class QONObject {
      * キーに対応する{@link QONArray}を返す。
      *
      * @param key キー
-     * @return キーに対応するQONArray
+     * @return キーに対応する{@link QONArray}
      * @throws NoSuchKeyException キーが存在しなかった場合
      */
     public QONArray getQONArray(String key) throws NoSuchKeyException {
