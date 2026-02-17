@@ -82,7 +82,7 @@ public class QONObject {
         if (objectMap.containsKey(key)) {
             return objectMap.get(key);
         } else {
-            throw new NoSuchKeyException("not exist key.", key);
+            throw new NoSuchKeyException("Not exist key.", key);
         }
     }
 
@@ -97,7 +97,7 @@ public class QONObject {
         if (arrayMap.containsKey(key)) {
             return arrayMap.get(key);
         } else {
-            throw new NoSuchKeyException("not exist key.", key);
+            throw new NoSuchKeyException("Not exist key.", key);
         }
     }
 
@@ -112,7 +112,7 @@ public class QONObject {
         if (valueMap.containsKey(key)) {
             return valueMap.get(key);
         } else {
-            throw new NoSuchKeyException("not exist key.", key);
+            throw new NoSuchKeyException("Not exist key.", key);
         }
     }
 

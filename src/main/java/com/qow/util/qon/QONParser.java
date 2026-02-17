@@ -104,7 +104,7 @@ record QONParser(QONObject target) {
                     int comp = (arrayStartIndex << 14) | (i - arrayStartIndex);
                     arrayIndex.add(comp);
                 } else if (isArrayStart(line) || isObjectStart(line)) {
-                    throw new UntrustedQONException("multiple array at " + i + ": " + line);
+                    throw new UntrustedQONException("Multiple array at " + i + ": " + line);
                 }
             } else if (isObjectStart(line)) {
                 object = true;
@@ -127,7 +127,7 @@ record QONParser(QONObject target) {
             }
         }
 
-        if (object || array) throw new UntrustedQONException("extra indent.");
+        if (object || array) throw new UntrustedQONException("Extra indent.");
 
         for (int i = 0; i < objectIndex.size(); i++) {
             int comp = objectIndex.poll();

@@ -1,0 +1,22 @@
+same=0
+number=1
+altnumber=$(number)
+first{
+    same=3
+    a=2
+    b=$(number)
+    c=$(after)
+    second{
+        same=4
+        d=5
+        e=$(a)
+        f=$(after)
+    }
+}
+list[
+    $(c)
+    x
+    $(number)
+    $(after)
+]
+after=-1

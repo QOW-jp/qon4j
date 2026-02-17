@@ -19,6 +19,7 @@ list[
     asd
 
     #
+    $(sep)
 ]
 separate=-----------------------
 sep=$(separate)
