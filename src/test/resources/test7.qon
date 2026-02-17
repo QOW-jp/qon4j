@@ -9,10 +9,16 @@ object{
     son=$(total)
     son_object{
         sonson = $(son)-$(first)
+        #sansan = sann
     }
 }
 list[
     $(1st)
+    dsa
+    #dss
+    asd
+
+    #
 ]
 separate=-----------------------
 sep=$(separate)
