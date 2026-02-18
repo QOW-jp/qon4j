@@ -129,8 +129,7 @@ record QONParser(QONObject target) {
 
         if (object || array) throw new UntrustedQONException("Extra indent.");
 
-        for (int i = 0; i < objectIndex.size(); i++) {
-            int comp = objectIndex.poll();
+        for (Integer comp : objectIndex) {
             int startIndex = comp >>> 14;
             int endIndex = startIndex + (comp & 0x3FFF);
 
